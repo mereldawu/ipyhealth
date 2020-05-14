@@ -60,6 +60,7 @@ setup(
     keywords='ipyhealth',
     name='ipyhealth',
     packages=find_packages(include=['ipyhealth', 'ipyhealth.*']),
+    package_data={'ipyhealth': ['templates/*json']},
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
