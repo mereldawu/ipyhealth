@@ -1,0 +1,120 @@
+{
+    "Workout": {
+        "pattern": "^HK(.+)ActivityType(.+)$",
+        "formats": {
+            "type": [
+                "workoutActivityType"
+            ],
+            "string": [
+                "sourceName"
+            ],
+            "no_format": [
+                "sourceVersion"
+            ],
+            "device": [
+                "device"
+            ],
+            "date": [
+                "creationDate",
+                "startDate",
+                "endDate"
+            ],
+            "standard": [
+                [
+                    "duration",
+                    "durationUnit"
+                ],
+                [
+                    "totalDistance",
+                    "totalDistanceUnit"
+                ],
+                [
+                    "totalEnergyBurned",
+                    "totalEnergyBurnedUnit"
+                ]
+            ]
+        }
+    },
+    "Record": {
+        "pattern": "^HK(.+)TypeIdentifier(.+)$",
+        "formats": {
+            "type": [
+                "type"
+            ],
+            "string": [
+                "sourceName"
+            ],
+            "no_format": [
+                "sourceVersion",
+                "unit",
+                "value"
+            ],
+            "device": [
+                "device"
+            ],
+            "date": [
+                "creationDate",
+                "startDate",
+                "endDate"
+            ]
+        }
+    },
+    "ActivitySummary": {
+        "formats": {
+            "date": [
+                "dateComponents"
+            ],
+            "numerics": [
+                "activeEnergyBurned",
+                "activeEnergyBurnedGoal",
+                "appleExerciseTime",
+                "appleExerciseTimeGoal",
+                "appleStandHours",
+                "appleStandHoursGoal"
+            ],
+            "no_format": [
+                "activeEnergyBurnedUnit"
+            ]
+        }
+    },
+    "WorkoutRoute": {
+        "formats": {
+            "date": [
+                "creationDate",
+                "startDate",
+                "endDate"
+            ],
+            "string": [
+                "sourceName"
+            ],
+            "no_format": [
+                "sourceVersion"
+            ]
+        }
+    },
+    "FileReference": {
+        "formats": {
+            "no_format": [
+                "path"
+            ]
+        }
+    },
+    "Me": {
+        "formats": {
+            "no_format": [
+                "HKCharacteristicTypeIdentifierDateOfBirth",
+                "HKCharacteristicTypeIdentifierBiologicalSex",
+                "HKCharacteristicTypeIdentifierBloodType",
+                "HKCharacteristicTypeIdentifierFitzpatrickSkinType"
+            ]
+        }
+    },
+    "ExportDate": {
+        "formats": {
+            "date": [
+                "value"
+            ]
+        }
+    }
+
+}
