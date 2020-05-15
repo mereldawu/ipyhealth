@@ -13,9 +13,9 @@ ipyhealth
         :alt: Documentation Status
 
 
-ipyhealth is a Pythoon3 library to parse, wrangle and plot `Apple Health data <https://developer.apple.com/documentation/healthkit/>`_ from all Apple devices.
+ipyhealth is a Python3 library to parse, wrangle and plot `Apple Health data <https://developer.apple.com/documentation/healthkit/>`_ from all Apple devices.
 
-ipyhealth makes it easy for developers to obtain the Apple Health data, saved as four `pandas` dataframe:
+ipyhealth makes it easy for developers to obtain the Apple Health data, saved as four `pandas` dataframes:
 
 1. `Samples <https://developer.apple.com/documentation/healthkit/samples>`_: data that is recorded at a specific time, including HKQuantitySample (height, heart rate, energy consumed, etc.), HKCategorySample (user in bed, asleep, or awake) and HKCorrelation (food and blood pressure).
 
@@ -52,7 +52,12 @@ Usage
 
   from ipyhealth.parser import AppleHealthParser
 
-  health_data = AppleHealthParser('/location/to/apple_health_export')
+  health_data = AppleHealthParser(
+        in_file = '/location/to/apple_health_export',
+        from_date = None, # date to start parsing, i.e. datetime(2020, 5, 1)
+        verbose = True, # print extract progress and success status, i.e. True/False
+        nprocs = 4 # number of CPUs to use
+  )
 
   type(health_data.records) # pd.DataFrame
   type(health_data.workouts) # pd.DataFrame
@@ -66,8 +71,8 @@ To export Apple Health data
 Download and extract the Apple Health data to a desired location:
 
 1. On your iPhone, open Health App.
-2. Click on your avatar > Scroll to the bottom > Export all health data.
-3. Select Save to Files (save at a location where you can read it).
+2. Click on your avatar > Scroll to the bottom > Export all health data (this takes some time).
+3. Select Save to Files (this is only available for iOS 13 and above, for lower verions of iOS save at a location where you can read it).
 4. Unzip the export.zip folder, which contains `apple_health_export` folder:
 
 | apple_health_export
@@ -76,7 +81,6 @@ Download and extract the Apple Health data to a desired location:
 | ├── **workout_routes**
 |    ├── route_{timestamp}.gpx (the GPS data for the associated workout)
 |    ├──route_{timestamp}.gpx (these contain the location information)
-
 
 
 Credits
