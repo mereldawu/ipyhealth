@@ -142,11 +142,11 @@ class AppleHealthFormatter():
 
         elif st_key in ['distance', 'energy_burned']:
             col_name = f'{st_key}_{unit_val}' \
-                if unit_val.startswith('k') else f'{st_key}_k{unit_val}'
 
             if unit_val in ("km", "kcal", "mi"):
                 outputs = col_name, float(st_val)
             elif unit_val in ("m", "cal"):
+                col_name = f'{st_key}_k{unit_val}'
                 outputs = col_name, float(st_val) / 1000
             else:
                 outputs = col_name, float(st_val)
