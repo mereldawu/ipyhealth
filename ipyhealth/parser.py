@@ -10,6 +10,7 @@ import math
 import json
 import string
 import logging
+import warnings
 from typing import Union
 from datetime import datetime
 from inspect import currentframe
@@ -36,6 +37,18 @@ except ImportError:
 PUNC = string.punctuation.replace('.', '')
 template = pkg_resources.read_text(templates, 'activity_format.json')
 NODES = json.loads(template)
+
+class ParserError(Exception):
+    """Raised when something generic is wrong in AppleHealthFormatter
+
+    Attributes:
+        expression -- input expression in which the error occurred
+        message -- explanation of the error
+    """
+
+    def __init__(self, message, errors):
+        super().__init__(message)
+        self.errors = errors
 
 
 class AppleHealthFormatter():
@@ -123,21 +136,27 @@ class AppleHealthFormatter():
             elif unit_val == "sec":
                 outputs = col_name, float(st_val) / 60
             else:
-                raise NotImplementedError("Unit {unit} not implemented.")
+                msg = f"Duration unit {unit_val} not implemented. Using original scale."
+                warnings.warn(msg, UserWarning)
+                raise NotImplementedError(f"Unit {unit_val} not implemented.")
 
         elif st_key in ['distance', 'energy_burned']:
             col_name = f'{st_key}_{unit_val}' \
                 if unit_val.startswith('k') else f'{st_key}_k{unit_val}'
 
-            if unit_val in ("km", "kcal"):
+            if unit_val in ("km", "kcal", "mi"):
                 outputs = col_name, float(st_val)
             elif unit_val in ("m", "cal"):
                 outputs = col_name, float(st_val) / 1000
             else:
-                raise NotImplementedError("Unit {unit} not implemented.")
-
+                outputs = col_name, float(st_val)
+                msg = f"Unit {unit_val} not implemented. Using original scale."
+                warnings.warn(msg, UserWarning)
         else:
-            raise NotImplementedError("Unit {unit} not implemented.")
+            col_name = f'{st_key}_{unit_val}'
+            outputs = col_name, float(st_val)
+            msg = f"Key {st_key} not implemented. Using original scale."
+            warnings.warn(msg, UserWarning)
 
         return outputs
 
@@ -475,6 +494,33 @@ class AppleHealthParser():
                 'not extracted properly. Please investigate.'
             )
 
+    def read_formatted_data(self, names: str) -> pd.DataFrame:
+        """Reading the formatted data from worker saved in tmp/
+
+        Args:
+            names: the names of the tmp data saved by the worker process
+
+        Returns:
+        df: a pandas dataframe that went through the formatting process,
+            containing the summarized apple health data.
+        """
+
+        df = pd.DataFrame()
+
+        for name in names:
+            try:
+                tmp = pd.read_pickle(name)
+            except FileNotFoundError as err:
+                msg = 'Something went wrong, the formatting process did not complete.'
+                self.logger.error(msg)
+                raise ParserError(msg, err)
+
+            df = pd.concat([df, tmp])
+            os.remove(name)
+
+        return df
+
+
     def create_dataframe(self, node_tag: str, nprocs: int) -> pd.DataFrame:
         """Create a pandas dataframe based on the node_tag
 
@@ -518,12 +564,7 @@ class AppleHealthParser():
         for proc in procs:
             proc.join()
 
-        df = pd.DataFrame()
-
-        for name in names:
-            tmp = pd.read_pickle(name)
-            df = pd.concat([df, tmp])
-            os.remove(name)
+        df = self.read_formatted_data(names)
 
         date_col = underscore(NODES[node_tag]['formats']['date'][0])
         df = df.sort_values(by=date_col).reset_index(drop=True)

@@ -1,12 +1,13 @@
 # pylint: disable=redefined-outer-name, missing-function-docstring
 import json
+import warnings
 from datetime import datetime
 from collections import Counter
 from xml.etree import ElementTree
 from inflection import underscore
 
 import pytest
-from ipyhealth.parser import AppleHealthFormatter, AppleHealthParser
+from ipyhealth.parser import AppleHealthFormatter, AppleHealthParser, ParserError
 
 from . import templates
 
@@ -76,6 +77,12 @@ def test_get_nodes(health_data):
     nodes2 = health_data.get_nodes(['Workout', 'ActivitySummary'])
     assert len(nodes1) == 16
     assert len(nodes2) == 24
+
+
+def test_parser_error(health_data):
+
+    with pytest.raises(ParserError):
+        health_data.read_formatted_data(['Hi', 'Hi2'])
 
 
 def test_get_export_data(health_data):
@@ -191,9 +198,9 @@ def test_format_standard(formatter, a_type, value, unit, o_name, o_val):
         ('a', 25000, 'random')
     ]
 )
-def test_standardize_unit_error(formatter, a_type, value, unit):
+def test_standardize_unit_warning(formatter, a_type, value, unit):
 
-    with pytest.raises(NotImplementedError):
+    with pytest.warns(UserWarning, match=r'\w+ not implemented.'):
         _, _ = formatter.format_standard((
             a_type,
             value,
