@@ -8,6 +8,8 @@ client_secrets.json
 my_creds.txt
 models/
 .DS_Store
+notebooks/*
+examples/data/*
 
 # C extensions
 *.so
